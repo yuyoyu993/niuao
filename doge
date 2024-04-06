@@ -1,0 +1,37 @@
+const DogecoinClient = require('dogecoin-core');
+
+// 创建 Dogecoin 客户端
+const client = new DogecoinClient({
+  network: 'mainnet', // 主网
+  username: 'YOUR_RPC_USERNAME',
+  password: 'YOUR_RPC_PASSWORD',
+  port: 8332, // RPC 端口，默认为 8332
+  host: '127.0.0.1', // Dogecoin Core 节点的主机地址
+  ssl: false, // 是否使用 SSL
+});
+
+// 设置发送者地址和私钥
+const senderAddress = 'SENDER_DOGECOIN_ADDRESS';
+const senderPrivateKey = 'SENDER_PRIVATE_KEY';
+
+// 设置接收者地址
+const recipientAddress = 'RECIPIENT_DOGECOIN_ADDRESS';
+
+// 设置转账金额（以 DOGE 为单位）
+const amount = 1.0; // 1 DOGE
+
+// 构造转账事务
+const transaction = {
+  from: senderAddress,
+  to: recipientAddress,
+  amount: amount,
+};
+
+// 发送转账
+client.sendToAddress(transaction, senderPrivateKey)
+  .then((txid) => {
+    console.log('Transaction sent. Transaction ID:', txid);
+  })
+  .catch((error) => {
+    console.error('Error occurred:', error);
+  });
