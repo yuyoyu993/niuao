@@ -1,0 +1,32 @@
+from nearpy import NEAR
+from nearpy.transaction import Transfer
+from nearpy.constants import NEAR_RPC_URL
+
+# 连接到 NEAR 节点
+near = NEAR(NEAR_RPC_URL)
+
+# 发送方账户私钥和接收方账户地址
+sender_account_id = "sender_account.testnet"
+sender_private_key = "YOUR_SENDER_PRIVATE_KEY"
+recipient_account_id = "recipient_account.testnet"
+
+# 转账金额（以 NEAR 为单位）
+amount = 10  # 10 NEAR
+
+# 创建转账交易
+transfer = Transfer(
+    sender_account_id=sender_account_id,
+    recipient_account_id=recipient_account_id,
+    amount=amount
+)
+
+# 签署交易
+signed_tx = near.sign_transaction(sender_private_key, transfer)
+
+# 发送交易
+tx_result = near.send_transaction(signed_tx)
+
+if tx_result['status']['SuccessValue'] is not None:
+    print("Transaction successful. Transaction hash:", tx_result['transaction']['hash'])
+else:
+    print("Transaction failed:", tx_result['status']['FailureValue'])
