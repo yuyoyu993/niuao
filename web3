@@ -1,0 +1,11 @@
+const contractABI = [...]; // 您的合约 ABI
+const contractAddress = '0xYourContractAddress'; // 智能合约地址
+
+const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+// 调用智能合约的方法
+contract.methods.someMethod(param1, param2).send({ from: senderAddress }).then((receipt) => {
+    console.log('智能合约调用成功:', receipt);
+}).catch((error) => {
+    console.error('智能合约调用出错:', error);
+});
