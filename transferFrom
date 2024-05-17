@@ -1,0 +1,60 @@
+const Web3 = require('web3');
+
+// 连接到以太坊节点（例如，Infura、Alchemy）
+const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID');
+
+// 发送者地址和私钥
+const senderAddress = '0xYourEthereumAddress';
+const privateKey = 'YOUR_PRIVATE_KEY';
+
+// 接收者地址
+const recipientAddress = '0xRecipientAddress';
+
+// NFT 合约地址和 Token ID
+const nftContractAddress = '0xYourNFTContractAddress';
+const tokenId = 1234;  // 您要转移的 NFT 的 Token ID
+
+// ERC-721 合约的部分 ABI，包含 transferFrom 方法
+const erc721Abi = [
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "transferFrom",
+        "outputs": [],
+        "type": "function"
+    }
+];
+
+// 创建 ERC-721 合约实例
+const nftContract = new web3.eth.Contract(erc721Abi, nftContractAddress);
+
+// 构建交易
+const transferData = nftContract.methods.transferFrom(senderAddress, recipientAddress, tokenId).encodeABI();
+
+const transaction = {
+    from: senderAddress,
+    to: nftContractAddress,
+    data: transferData,
+    gas: 50000,  // Gas 限额
+    gasPrice: web3.utils.toWei('10', 'gwei'),  // Gas 价格
+    nonce: await web3.eth.getTransactionCount(senderAddress),  // 获取 nonce
+};
+
+// 签名并发送交易
+const signedTx = await web3.eth.accounts.signTransaction(transaction, privateKey);
+const txHash = await web3.eth.sendRawTransaction(signedTx.rawTransaction);
+
+console.log('NFT 发送成功，交易哈希:', txHash.hex());
