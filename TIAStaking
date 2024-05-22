@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "./IERC20.sol";
+
+contract TIAStaking {
+    IERC20 public tiaToken;
+    mapping(address => uint256) public stakedAmount;
+    mapping(address => uint256) public stakedTime;
+
+    event Staked(address indexed staker, uint256 amount);
+    event Unstaked(address indexed staker, uint256 amount);
+
+    constructor(address _tiaToken) {
+        tiaToken = IERC20(_tiaToken);
+    }
+
+    function stake(uint256 amount) external {
+        require(amount > 0, "Amount must be greater than 0");
+        require(tiaToken.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+        stakedAmount[msg.sender] += amount;
+        stakedTime[msg.sender] = block.timestamp;
+        emit Staked(msg.sender, amount);
+    }
+
+    function unstake() external {
+        uint256 amount = stakedAmount[msg.sender];
+        require(amount > 0, "No stakes to unstake");
+        require(block.timestamp >= stakedTime[msg.sender] + 30 days, "Cannot unstake before 30 days");
+        stakedAmount[msg.sender] = 0;
+        require(tiaToken.transfer(msg.sender, amount), "Transfer failed");
+        emit Unstaked(msg.sender, amount);
+    }
+}
